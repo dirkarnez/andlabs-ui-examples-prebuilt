@@ -1,9 +1,9 @@
 name: golang-build-actions-workflow
 on:
   push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    # # Sequence of patterns matched against refs/tags
+    # tags:
+    #   - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
       
 permissions:
     contents: write
@@ -12,19 +12,50 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        compiler:
+        - {
+            name: "x86_64-8.1.0-release-posix-seh-rt_v6-rev0",
+            url: "https://github.com/dirkarnez/cpp-tools/raw/main/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z"
+          }
+        # - {
+        #     name: "winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r1",
+        #     url: "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-12.0.1-9.0.0-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r1.zip"
+        #   }
+        # - {
+        #     name: "msvc2019"
+        #   }
+        os: [windows-latest] # , ubuntu-latest, macos-latest]
+        
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          repository: 'andlabs/wakeup'
+          path: 'wakeup'
+          
+      - name: download compiler
+        if: ${{  matrix.compiler.url }}
+        shell: cmd
+        run: |
+          curl ${{ matrix.compiler.url }} -L --output compiler &&^
+          7z.exe x compiler
+          
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.21.0' # The Go version to download (if necessary) and use.
+          go-version: '1.23.0' # The Go version to download (if necessary) and use.
           
-      - run: go get .
-      
-      - run: go build
+      - shell: cmd
+        run: |
+          set PATH=^
+          %PATH%;^
+          ${{ github.workspace }}\mingw64;^
+          ${{ github.workspace }}\mingw64\bin;
+          gcc --version &&^
+          go mod init github.com/andlabs/wakeup &&^
+          go get github.com/andlabs/ui &&^
+          go build -ldflags="-H windowsgui" &&^
+          dir
       
       - name: Archive Release
         uses: thedoctor0/zip-release@master

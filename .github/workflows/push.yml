@@ -52,6 +52,7 @@ jobs:
           ${{ github.workspace }}\mingw64;^
           ${{ github.workspace }}\mingw64\bin;
           gcc --version &&^
+          cd wakeup &&^
           go mod init github.com/andlabs/wakeup &&^
           go get github.com/andlabs/ui &&^
           go build -ldflags="-H windowsgui" &&^

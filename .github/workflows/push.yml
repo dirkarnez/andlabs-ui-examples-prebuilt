@@ -56,6 +56,7 @@ jobs:
           mkdir histogram &&^
           move /Y histogram.go histogram &&^
           cd "histogram" &&^
+          sed -i "s/\/\/\s\++build\s\+OMIT//gi" histogram.go &&^
           go mod init github.com/andlabs/histogram &&^
           go get github.com/andlabs/ui &&^
           go build -ldflags="-H windowsgui" &&^

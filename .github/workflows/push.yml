@@ -24,14 +24,14 @@ jobs:
         # - {
         #     name: "msvc2019"
         #   }
-        os: [windows-latest] # , ubuntu-latest, macos-latest]
+        os: [ windows-latest ] # , ubuntu-latest, macos-latest]
         
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: 'andlabs/wakeup'
-          path: 'wakeup'
+          repository: 'andlabs/ui'
+          path: 'ui'
           
       - name: download compiler
         if: ${{  matrix.compiler.url }}
@@ -52,8 +52,11 @@ jobs:
           ${{ github.workspace }}\mingw64;^
           ${{ github.workspace }}\mingw64\bin;
           gcc --version &&^
-          cd wakeup &&^
-          go mod init github.com/andlabs/wakeup &&^
+          cd "ui\examples" &&^
+          mkdir histogram &&^
+          move /Y histogram.go histogram &&^
+          cd "histogram" &&^
+          go mod init github.com/andlabs/histogram &&^
           go get github.com/andlabs/ui &&^
           go build -ldflags="-H windowsgui" &&^
           dir
@@ -62,12 +65,12 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          path: ${{ github.event.repository.name }}*
-          filename: "${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
+          directory: "ui/examples"
+          filename: "andlabs-ui-histogram-${{ github.ref_name }}-${{ matrix.os }}.zip"
           
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
+          artifacts: "ui/examples/andlabs-ui-histogram-${{ github.ref_name }}-${{ matrix.os }}.zip"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}

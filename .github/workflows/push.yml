@@ -63,7 +63,7 @@ jobs:
           %USERPROFILE%\Downloads\mingw64;^
           %USERPROFILE%\Downloads\mingw64\bin;^
           %USERPROFILE%\Downloads\go\bin;^
-          %USERPROFILE%\Downloads\PortableGit-2.38.1-64-bit\bin;
+          %USERPROFILE%\Downloads\PortableGit-2.38.1-64-bit\usr\bin;
           set GOROOT=%USERPROFILE%\Downloads\go
           set GOPATH=%USERPROFILE%\Downloads\gopath
           go version &&^

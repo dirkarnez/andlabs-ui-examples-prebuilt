@@ -1,9 +1,9 @@
 name: golang-build-actions-workflow
 on:
   push:
-    # # Sequence of patterns matched against refs/tags
-    # tags:
-    #   - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
       
 permissions:
     contents: write
@@ -25,6 +25,12 @@ jobs:
         #     name: "msvc2019"
         #   }
         os: [ windows-latest ] # , ubuntu-latest, macos-latest]
+        examples: 
+        - controlgallery
+        - drawtext
+        - histogram
+        - table
+        - updateui
         
     runs-on: ${{ matrix.os }}
     steps:
@@ -69,11 +75,11 @@ jobs:
           go version &&^
           gcc --version &&^
           cd "ui\examples" &&^
-          mkdir histogram &&^
-          move /Y histogram.go histogram &&^
-          cd "histogram" &&^
-          sed -i "s/\/\/\s\++build\s\+OMIT//gi" histogram.go &&^
-          go mod init github.com/andlabs/histogram &&^
+          mkdir "${{ matrix.examples }}" &&^
+          move /Y "${{ matrix.examples }}.go" "${{ matrix.examples }}" &&^
+          cd "${{ matrix.examples }}" &&^
+          sed -i "s/\/\/\s\++build\s\+OMIT//gi" "${{ matrix.examples }}.go" &&^
+          go mod init "github.com/andlabs/${{ matrix.examples }}" &&^
           go get github.com/andlabs/ui &&^
           go build -ldflags="-H windowsgui" &&^
           dir
@@ -83,11 +89,11 @@ jobs:
         with:
           type: 'zip'
           directory: "ui/examples"
-          filename: "andlabs-ui-histogram-${{ github.ref_name }}-${{ matrix.os }}.zip"
+          filename: "andlabs-ui-${{ matrix.examples }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
           
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "ui/examples/andlabs-ui-histogram-${{ github.ref_name }}-${{ matrix.os }}.zip"
+          artifacts: "ui/examples/andlabs-ui-${{ matrix.examples }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}

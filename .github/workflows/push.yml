@@ -89,12 +89,12 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          directory: "ui/examples"
+          directory: "ui/examples/${{ matrix.examples }}"
           filename: "andlabs-ui-${{ matrix.examples }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
           
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "ui/examples/andlabs-ui-${{ matrix.examples }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
+          artifacts: "ui/examples/${{ matrix.examples }}/andlabs-ui-${{ matrix.examples }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}

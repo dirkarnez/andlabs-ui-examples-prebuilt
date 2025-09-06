@@ -13,14 +13,14 @@ jobs:
     strategy:
       matrix:
         compiler:
-        - {
-            name: "x86_64-8.1.0-release-posix-seh-rt_v6-rev0",
-            url: "https://github.com/dirkarnez/cpp-tools/raw/main/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z"
-          }
         # - {
-        #     name: "winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r1",
-        #     url: "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-12.0.1-9.0.0-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r1.zip"
+        #     name: "x86_64-8.1.0-release-posix-seh-rt_v6-rev0",
+        #     url: "https://github.com/dirkarnez/cpp-tools/raw/main/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z"
         #   }
+        - {
+            name: "winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r1",
+            url: "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-12.0.1-9.0.0-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r1.zip"
+          }
         # - {
         #     name: "msvc2019"
         #   }
@@ -37,20 +37,30 @@ jobs:
         if: ${{  matrix.compiler.url }}
         shell: cmd
         run: |
+          cd /d "%USERPROFILE%\Downloads" &&^
           curl ${{ matrix.compiler.url }} -L --output compiler &&^
           7z.exe x compiler
           
-      - name: Setup go
-        uses: actions/setup-go@v2
-        with:
-          go-version: '1.23.0' # The Go version to download (if necessary) and use.
+      # - name: Setup go
+      #   uses: actions/setup-go@v2
+      #   with:
+      #     go-version: '1.23.0' # The Go version to download (if necessary) and use.
+      - shell: cmd
+        run: |
+          cd /d "%USERPROFILE%\Downloads" &&^
+          curl https://go.dev/dl/go1.23.0.windows-amd64.zip -L -O &&^
+          7z.exe x go1.23.0.windows-amd64.zip
+          
           
       - shell: cmd
         run: |
           set PATH=^
-          %PATH%;^
-          ${{ github.workspace }}\mingw64;^
-          ${{ github.workspace }}\mingw64\bin;
+          %USERPROFILE%\Downloads\mingw64;^
+          %USERPROFILE%\Downloads\mingw64\bin;^
+          %USERPROFILE%\Downloads\go\bin;
+          set GOROOT=%USERPROFILE%\Downloads\go
+          set GOPATH=%USERPROFILE%\Downloads\gopath
+          go version &&^
           gcc --version &&^
           cd "ui\examples" &&^
           mkdir histogram &&^
